@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/fragments/resources :: head(pageTitle='Book Detail')}">
+<body>
+<nav th:replace="~{/fragments/navbar :: navbar(current='books')}"></nav>
+<div class="container" th:object="${book}">
+  <h1 th:text="*{title}"></h1>
+  <h2 class="text-muted" th:text="|Written by *{authors}|"></h2>
+  <hr>
+  <dl>
+    <dt>Publisher</dt>
+    <dd th:text="*{publisher}"></dd>
+    <dt>Year</dt>
+    <dd th:text="*{year}"></dd>
+    <dt>ISBN</dt>
+    <dd th:text="*{isbn}"></dd>
+    <dt>Number of copies</dt>
+    <dd th:text="*{numberOfCopies}"></dd>
+    <dt>Created at</dt>
+    <!--dd th:text="${book.getFormattedCreatedAt()}"></dd-->
+    <dd th:text="*{formattedCreatedAt}"></dd>
+    <dt>Synopsis</dt>
+    <dd th:text="*{synopsis}"></dd>
+  </dl>
+</div>
+</body>
+</html>

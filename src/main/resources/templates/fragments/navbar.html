@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<!-- fragment della navbar: current è il nome dell'area in cui sto navigando -->
+<nav class="navbar navbar-expand-lg" th:fragment="navbar(current)">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Spring Library</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <!-- nei link appendo la classe active se l'area corrisponde a quella del link -->
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/books}"
+             th:classappend="${current == 'books' ? 'active' : ''}">Books</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

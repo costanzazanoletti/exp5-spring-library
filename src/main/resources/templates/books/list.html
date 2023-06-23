@@ -3,27 +3,51 @@
 <head th:insert="~{/fragments/resources :: head(pageTitle='Book List')}">
 </head>
 <body>
-<h1>Book List</h1>
-<hr>
-<table>
-  <thead>
-  <tr>
-    <th>Title</th>
-    <th>Authors</th>
-    <th>Publisher</th>
-    <th>ISBN</th>
-    <th>Year</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="book : ${bookList}">
-    <td th:text="${book.title}"></td>
-    <td th:text="${book.authors}"></td>
-    <td th:text="${book.publisher}"></td>
-    <td th:text="${book.isbn}"></td>
-    <td th:text="${book.year}"></td>
-  </tr>
-  </tbody>
-</table>
+<nav th:replace="~{/fragments/navbar :: navbar(current='books')}"></nav>
+<div class="container">
+  <h1>Book List</h1>
+  <hr>
+  <!-- form di ricerca -->
+  <div>
+    <form th:action="@{/books}" method="GET">
+      <div class="input-group">
+        <input type="search" class="form-control" placeholder="Search by title or authors"
+               name="keyword" th:value="${searchInput}">
+        <button class="btn btn-outline-secondary" type="submit">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+  <!-- mostro la tabella solo se la lista ha risultati -->
+  <table class="table" th:if="${bookList.size() > 0}">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Authors</th>
+      <th>Publisher</th>
+      <th>ISBN</th>
+      <th>Year</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${bookList}">
+      <td th:text="${book.title}"></td>
+      <td th:text="${book.authors}"></td>
+      <td th:text="${book.publisher}"></td>
+      <td th:text="${book.isbn}"></td>
+      <td th:text="${book.year}"></td>
+      <td>
+        <a th:href="@{|/books/${book.id}|}"><i class="fa-solid fa-book"></i></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <!-- se la lista è vuota mostro un messaggio -->
+  <div class="alert alert-info" th:unless="${bookList.size() > 0}">
+    No results
+  </div>
+</div>
 </body>
 </html>

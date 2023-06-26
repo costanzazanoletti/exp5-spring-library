@@ -5,7 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -17,18 +21,24 @@ public class Book {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  @NotBlank(message = "Title must not be null or blank")
   @Column(nullable = false)
   private String title;
 
+  @NotBlank
+  @Size(min = 10, max = 13)
   @Column(nullable = false, unique = true)
   private String isbn;
   private String publisher;
   private String authors;
 
+  @Min(0)
   private Integer year;
 
+  @Lob
   private String synopsis;
 
+  @Min(0)
   private Integer numberOfCopies;
 
   private LocalDateTime createdAt;

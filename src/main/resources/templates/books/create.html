@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <head th:insert="~{/fragments/resources :: head(pageTitle='New Book')}">
+  </head>
+<body>
+<nav th:replace="~{/fragments/navbar :: navbar(current='books')}"></nav>
+<div class="container">
+  <h1>New Book</h1>
+  <hr>
+  <!-- form di creazione di un book -->
+  <form
+      th:action="@{/books/create}"
+      th:object="${book}"
+      method="post"
+      id="book-form"
+      class="row"
+  >
+    <!-- div con l'elenco di tutti gli errori -->
+    <!-- div th:if="${#fields.hasErrors()}">
+      <ul>
+        <li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
+      </ul>
+    </div -->
+    <div class="col-6">
+      <label class="form-label" for="book-title">Title</label>
+      <input class="form-control" type="text" id="book-title" th:field="*{title}"
+             th:errorClass="is-invalid">
+      <div class="form-text">Title must not be blank</div>
+      <div th:if="${#fields.hasErrors('title')}" class="invalid-feedback">
+        <ul>
+          <li th:each="err : ${#fields.errors('title')}" th:text="${err}"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="authors">Authors</label>
+      <input class="form-control" type="text" id="authors" th:field="*{authors}">
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="isbn">ISBN</label>
+      <input class="form-control" type="text" id="isbn" th:field="*{isbn}"
+             th:errorClass="is-invalid">
+      <div class="form-text">Title must not be blank and from 10 to 13 characters</div>
+      <div th:if="${#fields.hasErrors('isbn')}" class="invalid-feedback">
+        <ul>
+          <li th:each="err : ${#fields.errors('isbn')}" th:text="${err}"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="publisher">Publisher</label>
+      <input class="form-control" type="text" id="publisher" th:field="*{publisher}">
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="year">Publication year</label>
+      <input class="form-control" type="number" id="year" th:field="*{year}"
+             th:errorClass="is-invalid">
+      <div th:if="${#fields.hasErrors('year')}" class="invalid-feedback">
+        <ul>
+          <li th:each="err : ${#fields.errors('year')}" th:text="${err}"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="copies">Number of copies</label>
+      <input class="form-control" type="number" id="copies" th:field="*{numberOfCopies}"
+             th:errorClass="is-invalid">
+      <div th:if="${#fields.hasErrors('numberOfCopies')}" class="invalid-feedback">
+        <ul>
+          <li th:each="err : ${#fields.errors('numberOfCopies')}" th:text="${err}"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-12">
+      <label class="form-label" for="synopsis">Synopsis</label>
+      <textarea class="form-control" id="synopsis" th:field="*{synopsis}" rows="5"></textarea>
+    </div>
+    <div class="col-12 mt-3">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <a class="btn btn-primary" th:href="@{/books}">Cancel</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>

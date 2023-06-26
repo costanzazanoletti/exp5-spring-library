@@ -7,18 +7,24 @@
 <div class="container">
   <h1>Book List</h1>
   <hr>
-  <!-- form di ricerca -->
-  <div>
-    <form th:action="@{/books}" method="GET">
-      <div class="input-group">
-        <input type="search" class="form-control" placeholder="Search by title or authors"
-               name="keyword" th:value="${searchInput}">
-        <button class="btn btn-outline-secondary" type="submit">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </div>
-    </form>
+  <div class="d-flex justify-content-between align-items-center my-3">
+    <!-- link di add new book -->
+    <a class="btn btn-primary" th:href="@{/books/create}">Add Book</a>
+    <!-- form di ricerca -->
+    <div>
+      <form th:action="@{/books}" method="GET">
+        <div class="input-group">
+          <input type="search" class="form-control" placeholder="Search by title or authors"
+                 name="keyword" th:value="${searchInput}">
+          <button class="btn btn-outline-secondary" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
+
+
   <!-- mostro la tabella solo se la lista ha risultati -->
   <table class="table" th:if="${bookList.size() > 0}">
     <thead>

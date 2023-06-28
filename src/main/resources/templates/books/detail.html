@@ -18,7 +18,8 @@
     <dd th:text="*{numberOfCopies}"></dd>
     <dt>Created at</dt>
     <!--dd th:text="${book.getFormattedCreatedAt()}"></dd-->
-    <dd th:text="*{formattedCreatedAt}"></dd>
+    <!-- dd th:text="*{formattedCreatedAt}"></dd -->
+    <dd th:text="*{#temporals.format(createdAt, 'dd/MM/yyyy HH:MM')}"></dd>
     <dt>Synopsis</dt>
     <dd th:text="*{synopsis}"></dd>
   </dl>

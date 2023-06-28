@@ -4,7 +4,14 @@
 </head>
 <body>
 <nav th:replace="~{/fragments/navbar :: navbar(current='books')}"></nav>
+
 <div class="container">
+  <!-- eventuale messaggio -->
+  <div th:if="${message != null}" class="alert alert-dismissible fade show"
+       th:classAppend="${#strings.equalsIgnoreCase(message.type, 'SUCCESS')} ? 'alert-success' : 'alert-danger'">
+    <div th:text="${message.message}"></div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
   <h1>Book List</h1>
   <hr>
   <div class="d-flex justify-content-between align-items-center my-3">
@@ -44,8 +51,15 @@
       <td th:text="${book.publisher}"></td>
       <td th:text="${book.isbn}"></td>
       <td th:text="${book.year}"></td>
-      <td>
-        <a th:href="@{|/books/${book.id}|}"><i class="fa-solid fa-book"></i></a>
+      <td class="d-flex align-items-center">
+        <a class="btn btn-primary me-1" th:href="@{|/books/${book.id}|}"><i
+            class="fa-solid fa-book"></i></a>
+        <a class="btn btn-primary me-1" th:href="@{|/books/edit/${book.id}|}"><i
+            class="fa-solid fa-pen-to-square"></i></a>
+        <form th:action="@{|/books/delete/${book.id}|}" method="post">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-trash-can"></i>
+          </button>
+        </form>
       </td>
     </tr>
     </tbody>

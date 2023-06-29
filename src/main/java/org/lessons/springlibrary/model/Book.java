@@ -1,17 +1,21 @@
 package org.lessons.springlibrary.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "books")
@@ -42,6 +46,9 @@ public class Book {
   private Integer numberOfCopies;
 
   private LocalDateTime createdAt;
+
+  @OneToMany(mappedBy = "book", cascade = {CascadeType.REMOVE})
+  private List<Borrowing> borrowings = new ArrayList<>(); // relazione con i borrowing
 
   public Integer getId() {
     return id;
@@ -115,9 +122,31 @@ public class Book {
     this.createdAt = createdAt;
   }
 
+  public List<Borrowing> getBorrowings() {
+    return borrowings;
+  }
+
+  public void setBorrowings(List<Borrowing> borrowings) {
+    this.borrowings = borrowings;
+  }
+
   // getter custom per il timestamp formattato
   public String getFormattedCreatedAt() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MMMM dd 'at' HH:mm");
     return createdAt.format(formatter);
+  }
+
+  // getter custom per calcolare quante copie sono disponibili
+  public int getAvailableCopies() {
+    List<Borrowing> activeBorrowings = new ArrayList<>();
+    // filtro la lista di prestiti
+    // tengo solo i prestiti non restituiti (returnDate == null)
+    for (Borrowing b : borrowings) {
+      if (b.getReturnDate() == null) {
+        activeBorrowings.add(b);
+      }
+    }
+    // sottraggo al numero di copie la size di questa lista
+    return numberOfCopies - activeBorrowings.size();
   }
 }

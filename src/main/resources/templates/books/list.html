@@ -56,10 +56,18 @@
             class="fa-solid fa-book"></i></a>
         <a class="btn btn-primary me-1" th:href="@{|/books/edit/${book.id}|}"><i
             class="fa-solid fa-pen-to-square"></i></a>
-        <form th:action="@{|/books/delete/${book.id}|}" method="post">
+        <!-- il bottone di delete non deve essere in pagina se il book ha dei prestiti -->
+        <form
+            th:action="@{|/books/delete/${book.id}|}"
+            method="post"
+            th:if="${book.borrowings.size() == 0}"
+        >
           <button class="btn btn-primary" type="submit"><i class="fa-solid fa-trash-can"></i>
           </button>
         </form>
+        <button th:unless="${book.borrowings.size() == 0}" class="btn btn-primary" disabled><i
+            class="fa-solid fa-trash-can"></i>
+        </button>
       </td>
     </tr>
     </tbody>

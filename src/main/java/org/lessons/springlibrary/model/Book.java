@@ -6,11 +6,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,12 +47,21 @@ public class Book {
   private String synopsis;
 
   @Min(0)
-  private Integer numberOfCopies;
+  @NotNull
+  private Integer numberOfCopies = 0;
 
   private LocalDateTime createdAt;
 
   @OneToMany(mappedBy = "book", cascade = {CascadeType.REMOVE})
   private List<Borrowing> borrowings = new ArrayList<>(); // relazione con i borrowing
+
+  @ManyToMany
+  @JoinTable(
+      name = "book_category",
+      joinColumns = @JoinColumn(name = "book_id"),
+      inverseJoinColumns = @JoinColumn(name = "category_id")
+  )
+  private List<Category> categories = new ArrayList<>();
 
   public Integer getId() {
     return id;
@@ -128,6 +141,14 @@ public class Book {
 
   public void setBorrowings(List<Borrowing> borrowings) {
     this.borrowings = borrowings;
+  }
+
+  public List<Category> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(List<Category> categories) {
+    this.categories = categories;
   }
 
   // getter custom per il timestamp formattato

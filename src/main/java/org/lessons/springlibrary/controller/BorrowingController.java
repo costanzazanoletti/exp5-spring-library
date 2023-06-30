@@ -77,6 +77,11 @@ public class BorrowingController {
   @PostMapping("/edit/{id}")
   public String doEdit(@PathVariable Integer id,
       @Valid @ModelAttribute("borrowing") Borrowing formBorrowing, BindingResult bindingResult) {
+    // valido il formBorrowing
+    if (bindingResult.hasErrors()) {
+      // se ci sono errori ricreo il template del form
+      return "/borrowings/form";
+    }
     // verifico che esiste il borrowing da modificare
     Optional<Borrowing> borrowingToEdit = borrowingRepository.findById(id);
     if (borrowingToEdit.isEmpty()) {

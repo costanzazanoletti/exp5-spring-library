@@ -8,6 +8,7 @@ import org.lessons.springlibrary.messages.AlertMessage;
 import org.lessons.springlibrary.messages.AlertMessageType;
 import org.lessons.springlibrary.model.Book;
 import org.lessons.springlibrary.repository.BookRepository;
+import org.lessons.springlibrary.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,9 @@ public class BookController {
   // dipende da BookRepository
   @Autowired
   private BookRepository bookRepository;
+
+  @Autowired
+  private CategoryRepository categoryRepository;
 /*
   METODI PER READ
 * */
@@ -102,6 +106,8 @@ public class BookController {
   public String create(Model model) {
     // aggiungo al model l'attributo book contenente un Book vuoto
     model.addAttribute("book", new Book());
+    // aggiungo al model la lista delle categorie per popolare le checkbox
+    model.addAttribute("categoryList", categoryRepository.findAll());
     // return "/books/create"; // template con form di creazione di un book
     return "/books/edit"; // template unico per create e edit
   }
@@ -109,7 +115,7 @@ public class BookController {
   // controller che gestisce la post del form coi dati del book
   @PostMapping("/create")
   public String store(@Valid @ModelAttribute("book") Book formBook, BindingResult bindingResult,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes redirectAttributes, Model model) {
     // i dati del book sono dentro all'oggetto formBook
 
     // verifico se l'isbn è univoco
@@ -122,6 +128,8 @@ public class BookController {
     if (bindingResult.hasErrors()) {
       // ci sono stati errori
       // return "/books/create"; // ritorno il template del form ma col book precaricato
+      // aggiungo al model la lista delle categorie per popolare le checkbox
+      model.addAttribute("categoryList", categoryRepository.findAll());
       return "/books/edit"; // template unico per create e edit
     }
 
@@ -152,6 +160,8 @@ public class BookController {
     // recupero i dati di quel book da database
     // aggiungo il book al model
     model.addAttribute("book", book);
+    // aggiungo al model la lista delle categorie per popolare le checkbox
+    model.addAttribute("categoryList", categoryRepository.findAll());
     // restituisco il template con il form di edit
     return "/books/edit";
   }
@@ -161,7 +171,8 @@ public class BookController {
       @PathVariable Integer id,
       @Valid @ModelAttribute("book") Book formBook,
       BindingResult bindingResult,
-      RedirectAttributes redirectAttributes
+      RedirectAttributes redirectAttributes,
+      Model model
   ) {
     // cerco il book per id
     Book bookToEdit = getBookById(id); // vecchia versione del book
@@ -173,6 +184,8 @@ public class BookController {
           "isbn must be unique"));
     }
     if (bindingResult.hasErrors()) {
+      // aggiungo al model la lista delle categorie per popolare le checkbox
+      model.addAttribute("categoryList", categoryRepository.findAll());
       // se ci sono errori ritorno il template col form
       return "/books/edit";
     }

@@ -11,3 +11,12 @@ INSERT INTO book_category (book_id, category_id) VALUES(1,2);
 INSERT INTO book_category (book_id, category_id) VALUES(1,3);
 INSERT INTO book_category (book_id, category_id) VALUES(2,2);
 
+INSERT INTO roles (id, name) VALUES(1,'ADMIN');
+INSERT INTO roles (id, name) VALUES(2,'USER');
+INSERT INTO users (id, email, first_name, last_name, password) VALUES(1, 'john@email.com', 'John', 'Doe', '{noop}john');
+INSERT INTO users (id, email, first_name, last_name, password) VALUES(2, 'jane@email.com', 'Jane', 'Doe', '{noop}jane');
+INSERT INTO users_roles (roles_id, user_id) VALUES(1, 1);
+INSERT INTO users_roles (roles_id, user_id) VALUES(2, 2);
+
+
+

@@ -25,6 +25,12 @@ public class DatabaseUserDetails implements UserDetails {
 
     this.authorities = new HashSet<>();
     // itero su tutti i ruoli e li trasformo in Authorities
+    /*
+     * impiegato biblioteca -> ADMIN
+     * utente iscritto -> USER
+     * magazziniere -> ADMIN
+     * */
+
     for (Role role : user.getRoles()) {
       authorities.add(new SimpleGrantedAuthority(role.getName()));
     }

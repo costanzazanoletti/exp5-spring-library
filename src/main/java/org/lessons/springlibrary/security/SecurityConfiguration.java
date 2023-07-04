@@ -58,10 +58,12 @@ public class SecurityConfiguration {
         .requestMatchers("/books/create").hasAuthority("ADMIN")
         .requestMatchers("/books/**").hasAnyAuthority("ADMIN", "USER")
         .requestMatchers("/borrowings/**").hasAuthority("ADMIN")
-        .requestMatchers(HttpMethod.POST).hasAuthority("ADMIN")
+        .requestMatchers(HttpMethod.POST, "/books/**").hasAuthority("ADMIN")
         .requestMatchers("/**").permitAll()
         .and().formLogin()
         .and().logout();
+    // disabilitiamo csfr per poter invocare le api da Postman
+    http.csrf().disable();
     return http.build();
 
   }

@@ -1,5 +1,6 @@
 package org.lessons.springlibrary.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,6 +53,7 @@ public class Book {
 
   private LocalDateTime createdAt;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "book", cascade = {CascadeType.REMOVE})
   private List<Borrowing> borrowings = new ArrayList<>(); // relazione con i borrowing
 
@@ -152,6 +154,7 @@ public class Book {
   }
 
   // getter custom per il timestamp formattato
+  @JsonIgnore
   public String getFormattedCreatedAt() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MMMM dd 'at' HH:mm");
     return createdAt.format(formatter);

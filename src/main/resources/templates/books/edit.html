@@ -20,6 +20,7 @@
       method="post"
       id="book-form"
       class="row"
+      enctype="multipart/form-data"
   >
     <!-- campi del libro -->
     <div class="col-8">
@@ -77,6 +78,20 @@
         <div class="col-12">
           <label class="form-label" for="synopsis">Synopsis</label>
           <textarea class="form-control" id="synopsis" th:field="*{synopsis}" rows="5"></textarea>
+        </div>
+        <!-- input per file di cover -->
+        <div class="col-12">
+          <label for="coverFile" class="form-label">Cover</label>
+          <input class="form-control" type="file" id="coverFile" th:field="*{coverFile}"
+                 th:errorClass="is-invalid">
+          <div th:if="${#fields.hasErrors('coverFile')}" class="invalid-feedback">
+            <ul>
+              <li th:each="err : ${#fields.errors('coverFile')}" th:text="${err}"></li>
+            </ul>
+          </div>
+          <div>
+            <img width="100" th:src="@{|/files/cover/*{id}|}" alt="current cover">
+          </div>
         </div>
       </div>
     </div>

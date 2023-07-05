@@ -1,14 +1,17 @@
 package org.lessons.springlibrary.controller;
 
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.lessons.springlibrary.dto.BookForm;
+import org.lessons.springlibrary.exceptions.BookNotFoundException;
+import org.lessons.springlibrary.exceptions.NotUniqueIsbnException;
 import org.lessons.springlibrary.messages.AlertMessage;
 import org.lessons.springlibrary.messages.AlertMessageType;
 import org.lessons.springlibrary.model.Book;
 import org.lessons.springlibrary.repository.BookRepository;
 import org.lessons.springlibrary.repository.CategoryRepository;
+import org.lessons.springlibrary.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -34,6 +37,9 @@ public class BookController {
 
   @Autowired
   private CategoryRepository categoryRepository;
+
+  @Autowired
+  BookService bookService;
 /*
   METODI PER READ
 * */
@@ -104,8 +110,8 @@ public class BookController {
   // controller che restituisce la pagina con form di creazione del nuovo book
   @GetMapping("/create")
   public String create(Model model) {
-    // aggiungo al model l'attributo book contenente un Book vuoto
-    model.addAttribute("book", new Book());
+    // aggiungo al model l'attributo book contenente un BookForm vuoto
+    model.addAttribute("book", new BookForm());
     // aggiungo al model la lista delle categorie per popolare le checkbox
     model.addAttribute("categoryList", categoryRepository.findAll());
     // return "/books/create"; // template con form di creazione di un book
@@ -114,30 +120,26 @@ public class BookController {
 
   // controller che gestisce la post del form coi dati del book
   @PostMapping("/create")
-  public String store(@Valid @ModelAttribute("book") Book formBook, BindingResult bindingResult,
+  public String store(@Valid @ModelAttribute("book") BookForm bookForm, BindingResult bindingResult,
       RedirectAttributes redirectAttributes, Model model) {
-    // i dati del book sono dentro all'oggetto formBook
-
-    // verifico se l'isbn è univoco
-    if (!isUniqueIsbn(formBook)) {
-      // aggiungo a mano un errore nella mappa BindingResult
-      bindingResult.addError(new FieldError("book", "isbn", formBook.getIsbn(), false, null, null,
-          "isbn must be unique"));
+    // se non ci sono errori di validazione provo a creare il Book a partire dal BookForm
+    if (!bindingResult.hasErrors()) {
+      // chiedo al BookService di salvare su db un Book a partire dal BookForm
+      try {
+        bookService.create(bookForm);
+      } catch (NotUniqueIsbnException e) {
+        bindingResult.addError(new FieldError("book", "isbn", bookForm.getIsbn(), false, null, null,
+            "isbn must be unique"));
+      }
     }
+
     // verifico se in validazione ci sono stati errori
     if (bindingResult.hasErrors()) {
       // ci sono stati errori
-      // return "/books/create"; // ritorno il template del form ma col book precaricato
       // aggiungo al model la lista delle categorie per popolare le checkbox
       model.addAttribute("categoryList", categoryRepository.findAll());
       return "/books/edit"; // template unico per create e edit
     }
-
-    // setto il timestamp di creazione
-    formBook.setCreatedAt(LocalDateTime.now());
-    // persisto formBook su database
-    // il metodo save fa una create sql se l'oggetto con quella PK non esiste, altrimenti fa update
-    bookRepository.save(formBook);
 
     // se tutto va a buon fine rimando alla lista dei books
     redirectAttributes.addFlashAttribute("message",
@@ -150,38 +152,39 @@ public class BookController {
   * */
   @GetMapping("/edit/{id}")
   public String edit(@PathVariable Integer id, Model model) {
-    /*// verificare se esiste un book con quell'id
-    Optional<Book> result = bookRepository.findById(id);
-    // se non esiste ritorno un http 404
-    if (result.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "book with id " + id + " not found");
-    }*/
-    Book book = getBookById(id);
-    // recupero i dati di quel book da database
-    // aggiungo il book al model
-    model.addAttribute("book", book);
-    // aggiungo al model la lista delle categorie per popolare le checkbox
-    model.addAttribute("categoryList", categoryRepository.findAll());
-    // restituisco il template con il form di edit
-    return "/books/edit";
+
+    try {
+      // recupero i dati di quel book da database
+      BookForm bookForm = bookService.getBookFormById(id);
+      // aggiungo il book al model
+      model.addAttribute("book", bookForm);
+      // aggiungo al model la lista delle categorie per popolare le checkbox
+      model.addAttribute("categoryList", categoryRepository.findAll());
+      // restituisco il template con il form di edit
+      return "/books/edit";
+    } catch (BookNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
   }
 
   @PostMapping("/edit/{id}")
   public String doEdit(
       @PathVariable Integer id,
-      @Valid @ModelAttribute("book") Book formBook,
+      @Valid @ModelAttribute("book") BookForm bookForm,
       BindingResult bindingResult,
       RedirectAttributes redirectAttributes,
       Model model
   ) {
-    // cerco il book per id
-    Book bookToEdit = getBookById(id); // vecchia versione del book
-    // nuova versione del book è formBook
-    // valido formBook
-    // se il vecchio isbn e quello nuovo sono diversi e quello nuovo è già presente su database allora errore
-    if (!bookToEdit.getIsbn().equals(formBook.getIsbn()) && !isUniqueIsbn(formBook)) {
-      bindingResult.addError(new FieldError("book", "isbn", formBook.getIsbn(), false, null, null,
-          "isbn must be unique"));
+
+    if (!bindingResult.hasErrors()) {
+      try {
+        bookService.update(bookForm);
+      } catch (BookNotFoundException e) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      } catch (NotUniqueIsbnException e) {
+        bindingResult.addError(new FieldError("book", "isbn", bookForm.getIsbn(), false, null, null,
+            "isbn must be unique"));
+      }
     }
     if (bindingResult.hasErrors()) {
       // aggiungo al model la lista delle categorie per popolare le checkbox
@@ -190,11 +193,6 @@ public class BookController {
       return "/books/edit";
     }
 
-    // trasferisco su formBook tutti i valori dei campi che non sono presenti nel form (altrimenti li perdo)
-    formBook.setId(bookToEdit.getId());
-    formBook.setCreatedAt(bookToEdit.getCreatedAt());
-    // salvo i dati
-    bookRepository.save(formBook);
     redirectAttributes.addFlashAttribute("message",
         new AlertMessage(AlertMessageType.SUCCESS, "Book updated!"));
     return "redirect:/books";

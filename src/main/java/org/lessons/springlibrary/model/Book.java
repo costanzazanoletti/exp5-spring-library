@@ -53,6 +53,10 @@ public class Book {
 
   private LocalDateTime createdAt;
 
+  @Lob
+  @Column(length = 16777215)
+  private byte[] cover;
+
   @JsonIgnore
   @OneToMany(mappedBy = "book", cascade = {CascadeType.REMOVE})
   private List<Borrowing> borrowings = new ArrayList<>(); // relazione con i borrowing
@@ -151,6 +155,14 @@ public class Book {
 
   public void setCategories(List<Category> categories) {
     this.categories = categories;
+  }
+
+  public byte[] getCover() {
+    return cover;
+  }
+
+  public void setCover(byte[] cover) {
+    this.cover = cover;
   }
 
   // getter custom per il timestamp formattato

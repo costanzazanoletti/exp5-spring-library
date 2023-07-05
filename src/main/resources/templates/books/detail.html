@@ -10,7 +10,7 @@
   <!-- dettagli del libro -->
   <section class="row">
     <!-- dettagli del libro -->
-    <div class="col-8">
+    <div class="col-4">
       <dl>
         <dt>Publisher</dt>
         <dd th:text="*{publisher}"></dd>
@@ -30,6 +30,12 @@
         <dt>Synopsis</dt>
         <dd th:text="*{synopsis}"></dd>
       </dl>
+    </div>
+    <!-- cover -->
+    <div class="col-4">
+      <img class="img-fluid"
+           th:src="@{|/files/cover/*{id}|}"
+           alt="cover">
     </div>
     <!-- categorie -->
     <div class="col-4">
